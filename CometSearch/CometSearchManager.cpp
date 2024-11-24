@@ -44,6 +44,7 @@ Mutex                         g_pvQueryMutex;
 Mutex                         g_pvDBIndexMutex;
 Mutex                         g_preprocessMemoryPoolMutex;
 Mutex                         g_searchMemoryPoolMutex;
+Mutex                         g_fileXcorrMutex;
 CometStatus                   g_cometStatus;
 string                        g_sCometVersion;
 
@@ -620,6 +621,9 @@ CometSearchManager::CometSearchManager() :
    // Initialize the mutex we'll use to protect the search memory pool
    Threading::CreateMutex(&g_searchMemoryPoolMutex);
 
+   // Initialize the mutex for writing all Xcorr to file.
+   Threading::CreateMutex(&g_fileXcorrMutex);
+
    // Initialize the Comet version
    SetParam("# comet_version", comet_version, comet_version);
    _tp = new ThreadPool();
@@ -638,6 +642,9 @@ CometSearchManager::~CometSearchManager()
 
    // Destroy the mutex we used to protect the search memory pool
    Threading::DestroyMutex(g_searchMemoryPoolMutex);
+
+   // Destroy the mutex we used to protect the xcorr file
+   Threading::DestroyMutex(g_fileXcorrMutex);
 
    //std::vector calls destructor of every element it contains when clear() is called
    g_pvInputFiles.clear();

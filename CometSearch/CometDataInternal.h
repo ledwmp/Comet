@@ -1136,6 +1136,7 @@ extern Mutex                   g_pvDBIndexMutex;
 extern Mutex                   g_preprocessMemoryPoolMutex;
 extern Mutex                   g_searchMemoryPoolMutex;
 extern Mutex                   g_dbIndexMutex;
+extern Mutex                   g_fileXcorrMutex;
 
 struct IonSeriesStruct         // defines which fragment ion series are considered
 {

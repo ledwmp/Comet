@@ -3150,6 +3150,28 @@ char CometSearch::GetAA(int i,
 
 }
 
+// Write all Xcorr to file. This is for testing only, will be super inefficient with lots of io
+void WriteXcorrFile(const double& dXcorr, const bool& bDecoyPep, Query*& pQuery) {
+
+   const char* filename = "xcorr.txt";
+
+   FILE* file = fopen(filename, "a");
+
+   if (file == nullptr) 
+   {
+      return 1;
+   }
+
+   fprintf(file, "%d,%d,%d,%f\n", 
+            pQuery->_spectrumInfoInternal.iScanNumber,
+            pQuery->_spectrumInfoInternal.iChargeState,
+            bDecoyPep,
+            dXcorr);
+
+   fclose(file);
+
+   return 0;
+}
 
 // Compares sequence to MSMS spectrum by matching ion intensities.
 void CometSearch::XcorrScore(char *szProteinSeq,
@@ -3280,6 +3302,11 @@ void CometSearch::XcorrScore(char *szProteinSeq,
    }
 
    dXcorr *= 0.005;  // Scale intensities to 50 and divide score by 1E4.
+
+   // Lock the file mutex so that all threads can safely write to file
+   Threading::LockMutex(g_fileXcorrMutex);
+   WriteXcorrFile(dXcorr, bDecoyPep, pQuery);
+   Threading::UnlockMutex(g_fileXcorrMutex);
 
    dXcorr= std::round(dXcorr* 1000.0) / 1000.0;  // round to 3 decimal points
 
@@ -3436,6 +3463,11 @@ void CometSearch::XcorrScoreI(char *szProteinSeq,
    }
 
    dXcorr *= 0.005;  // Scale intensities to 50 and divide score by 1E4.
+
+   // Lock the file mutex so that all threads can safely write to file
+   Threading::LockMutex(g_fileXcorrMutex);
+   WriteXcorrFile(dXcorr, bDecoyPep, pQuery);
+   Threading::UnlockMutex(g_fileXcorrMutex);
 
    dXcorr= std::round(dXcorr* 1000.0) / 1000.0;  // round to 3 decimal points
 
