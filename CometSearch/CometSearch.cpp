@@ -3153,13 +3153,14 @@ char CometSearch::GetAA(int i,
 // Write all Xcorr to file. This is for testing only, will be super inefficient with lots of io
 void WriteXcorrFile(const double& dXcorr, const bool& bDecoyPep, Query*& pQuery) {
 
-   const char* filename = "xcorr.txt";
+   char szOutputXcorr[256];
+   sprintf(szOutputXcorr, "xcorr%s.txt", g_staticParams.szOutputSuffix);
 
-   FILE* file = fopen(filename, "a");
+   FILE* file = fopen(szOutputXcorr, "a");
 
    if (file == nullptr) 
    {
-      return 1;
+      return;
    }
 
    fprintf(file, "%d,%d,%d,%f\n", 
@@ -3170,7 +3171,6 @@ void WriteXcorrFile(const double& dXcorr, const bool& bDecoyPep, Query*& pQuery)
 
    fclose(file);
 
-   return 0;
 }
 
 // Compares sequence to MSMS spectrum by matching ion intensities.
