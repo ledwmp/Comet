@@ -19,6 +19,7 @@
 #include "CometPostAnalysis.h"
 #include "CometMassSpecUtils.h"
 #include "CometStatus.h"
+#include <cstdio>
 
 
 #include "CometDecoys.h"  // this is where decoyIons[EXPECT_DECOY_SIZE] is initialized
@@ -735,8 +736,10 @@ bool CometPostAnalysis::CalculateEValue(int iWhichQuery,
    pQuery->fPar[3] = (float)iNextCorr;
    pQuery->siMaxXcorr = (short)iMaxCorr;
 
-   dSlope *= 10.0; // Used in pow() function so do multiply outside of for loop.
+   // dSlope *= 10.0; // Used in pow() function so do multiply outside of for loop.
+   dSlope *= 1000.0; // Change for smaller bin size. Used in pow() function so do multiply outside of for loop.
 
+   // printf("\nParams: %f - %f - %d - %d\n", dSlope, dIntercept, iStartCorr, iNextCorr); 
    int iLoopCount;
 
    iLoopCount = max(pQuery->iMatchPeptideCount, pQuery->iDecoyMatchPeptideCount);
@@ -801,7 +804,7 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
    int iMaxCorr=0;   // max xcorr index
    int iStartCorr;
    int iNumPoints;
-
+   // printf("\nHistosize: %d - %d\n", HISTO_SIZE, sizeof(pdCumulative));
    // Find maximum correlation score index.
    for (i=HISTO_SIZE-2; i>=0; i--)
    {
@@ -859,6 +862,7 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
    for (i=iNextCorr-1; i>=0; i--)
    {
       pdCumulative[i] = pdCumulative[i+1] + piHistogram[i];
+      // This zeros out cumuluative if consecutive bins are zero. 
       if (piHistogram[i+1] == 0)
          pdCumulative[i+1] = 0.0;
    }
@@ -871,8 +875,11 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
          pdCumulative[i] = log10(pdCumulative[i]);
       else
       {
-         if (pdCumulative[i+1] > 0.0)
-            pdCumulative[i] = log10(pdCumulative[i+1]);
+         if (piHistogram[i+1] > 0.0)
+         // if (pdCumulative[i+1] > 0.0)
+            // Think this is a bug. 
+            // pdCumulative[i] = log10(pdCumulative[i+1]);
+            pdCumulative[i] = log10(piHistogram[i+1]);
          else
             pdCumulative[i] = 0.0;
       }
@@ -900,6 +907,7 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
       // Calculate means.
       for (i=iStartCorr; i<=iNextCorr; ++i)
       {
+         // printf("%d - %d - %f\n", i, piHistogram[i], pdCumulative[i]);
          if (piHistogram[i] > 0)
          {
             SumY += (float)pdCumulative[i];
@@ -919,7 +927,7 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
       // Calculate sum of squares.
       for (i=iStartCorr; i<=iNextCorr; ++i)
       {
-         if (pdCumulative[i] > 0)
+         if ((pdCumulative[i] > 0) && (piHistogram[i] > 0))
          {
             double dX;
             double dY;
