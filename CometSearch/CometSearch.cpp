@@ -3154,7 +3154,7 @@ char CometSearch::GetAA(int i,
 void WriteXcorrFile(const double& dXcorr, const bool& bDecoyPep, Query*& pQuery) {
 
    char szOutputXcorr[256];
-   sprintf(szOutputXcorr, "xcorr%s.txt", g_staticParams.szOutputSuffix);
+   sprintf(szOutputXcorr, "%s__xcorr%s.txt", g_staticParams.inputFile.szBaseName, g_staticParams.szOutputSuffix);
 
    FILE* file = fopen(szOutputXcorr, "a");
 
@@ -3325,7 +3325,8 @@ void CometSearch::XcorrScore(char *szProteinSeq,
    {
       int iTmp;
 
-      iTmp = (int)(dXcorr * 10.0 + 0.5);
+      // iTmp = (int)(dXcorr * 10.0 + 0.5);
+      iTmp = (int)(dXcorr * 1000.0 + 50.0);
 
       if (iTmp < 0) // possible for CRUX compiled option to have a negative xcorr
          iTmp = 0;  // lump these all in the mininum score bin of the histogram
@@ -3486,7 +3487,8 @@ void CometSearch::XcorrScoreI(char *szProteinSeq,
    {
       int iTmp;
 
-      iTmp = (int)(dXcorr * 10.0 + 0.5);
+      // iTmp = (int)(dXcorr * 10.0 + 0.5);
+      iTmp = (int)(dXcorr * 1000.0 + 50.0);
 
       if (iTmp < 0) // possible for CRUX compiled option to have a negative xcorr
          iTmp = 0;  // lump these all in the zero bin of the histogram

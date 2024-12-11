@@ -54,7 +54,8 @@ class CometSearchManager;
 #define WIDTH_REFERENCE             512      // length of the protein accession field to store
 #define MAX_PROTEINS                50       // maximum number of proteins to return for each query; for index search only right now
 
-#define HISTO_SIZE                  152      // some number greater than 150
+// #define HISTO_SIZE                  152      // some number greater than 150
+#define HISTO_SIZE                  15200 //152      // some number greater than 150
 
 #define NO_PEFF_VARIANT             -127
 

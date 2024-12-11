@@ -815,7 +815,8 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
 
    for (i=0; i<iMaxCorr; ++i)
    {
-      if (piHistogram[i] == 0 && bFoundFirstNonZeroEntry && i >= 10)
+      // if (piHistogram[i] == 0 && bFoundFirstNonZeroEntry && i >= 10)
+      if (piHistogram[i] == 0 && bFoundFirstNonZeroEntry && i >= 1000) // Set for 0.001`bin width
       {
          // register iNextCorr if there's a histo value of 0 consecutively
          if (piHistogram[i+1] == 0 || i+1 == iMaxCorr)
@@ -833,15 +834,18 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
    {
       iNextCorr = iMaxCorr;
 
-      if (iMaxCorr >= 10)
+      // if (iMaxCorr >= 10)
+      if (iMaxCorr >= 1000) // Set for 0.001 bin width
       {
-         for (i = iMaxCorr; i >= iMaxCorr - 5; --i)
+         // for (i = iMaxCorr; i >= iMaxCorr - 5; --i)
+         for (i = iMaxCorr; i >= iMaxCorr - 599; --i) // Set for 0.001 bin width
          {
             if (piHistogram[i] == 0)
             {
                iNextCorr = i;
 
-               if (iMaxCorr <= 20)
+               // if (iMaxCorr <= 20)
+               if (iMaxCorr <= 2000) // Set for 0.001 bin width
                   break;
             }
          }
@@ -874,7 +878,8 @@ void CometPostAnalysis::LinearRegression(int *piHistogram,
       }
    }
 
-   iStartCorr = iNextCorr - 5;
+   // iStartCorr = iNextCorr - 5;
+   iStartCorr = iNextCorr - 599; // Set for regressing through 600 points
    int iNumZeroes = 0;
    for (i=iStartCorr; i<=iNextCorr; ++i)
       if (pdCumulative[i] == 0)
@@ -1072,8 +1077,8 @@ bool CometPostAnalysis::GenerateXcorrDecoys(int iWhichQuery)
          }
       }
 
-      k = (int)(dFastXcorr*10.0*0.005 + 0.5);  // 10 for histogram, 0.005=50/10000.
-
+      // k = (int)(dFastXcorr*10.0*0.005 + 0.5);  // 10 for histogram, 0.005=50/10000.
+      k = (int)(dFastXcorr*1000.0*0.005 + 50.0);  // 1000 for histogram, 0.005=50/10000.
       if (k < 0)
          k = 0;
 
